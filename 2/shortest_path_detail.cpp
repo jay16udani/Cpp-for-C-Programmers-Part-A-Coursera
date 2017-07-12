@@ -10,6 +10,12 @@ This algorithm is not ideal because in case of very large number of vertices,
 it would take O(n^2) time. I am kneen to know a better way to implement this algorithm.
 */
 
+/*
+Output of the program is:
+Avg path length with edge density 20% is: 4.5
+Avg path length with edge density 40% is: 4
+*/
+
 #include <iostream>
 #include <vector>
 #include <utility>
