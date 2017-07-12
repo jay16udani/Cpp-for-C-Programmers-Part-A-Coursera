@@ -10,12 +10,6 @@ This algorithm is not ideal because in case of very large number of vertices,
 it would take O(n^2) time. I am kneen to know a better way to implement this algorithm.
 */
 
-/*
-Output of the program is:
-Avg path length with edge density 20% is: 4.5
-Avg path length with edge density 40% is: 4
-*/
-
 #include <iostream>
 #include <vector>
 #include <utility>
@@ -29,24 +23,24 @@ class Graph
 	public:
 		//graph of 50 nodes where first quantity defines wheher a path exists or not
 		//and second one defines its weight if its exists
-		pair <bool, int> graph[50][50]; 
-		int edge_density,min_dist,max_dist;
+		pair <bool, int> graph[100][100]; 
+		int edge_density,min_dist,max_dist,vertices;
 		
-		Graph(int edge_density, int min_dist,int max_dist): edge_density(edge_density), min_dist(min_dist), max_dist(max_dist)
+		Graph(int edge_density, int min_dist,int max_dist, int vertices): edge_density(edge_density), min_dist(min_dist), max_dist(max_dist), vertices(vertices)
 		{
 			//initialization
-			for(int i=0;i<50;i++)
+			for(int i=0;i<vertices;i++)
 			{
-				for(int j=0;j<50;j++)
+				for(int j=0;j<vertices;j++)
 				{
 					graph[i][j].first = false;
 					graph[i][j].second = 0;
 				}
 			}
 			
-			for(int i=0;i<50;i++)
+			for(int i=0;i<vertices;i++)
 			{
-				for(int j=0;j<50;j++)
+				for(int j=0;j<vertices;j++)
 				{
 					if(i!=j)
 					{
@@ -84,29 +78,13 @@ class Graph
 		
 		virtual void path(int source, int destination) = 0; //pure virtual function for calculating shortest path 
 		
-		//function for calculating avg path length
-		inline void avgpathlength()
-		{
-			float counter = 0;
-			float sum = 0;
-			
-			for(int i=1;i<50;i++)
-			{
-				if(graph[0][i].first == true)
-				{
-					sum+=graph[0][i].second;
-					counter++;
-				}
-			}
-			cout << "Avg path length with edge density " << edge_density << "% is: " << (sum / counter) << endl;
-		}
 		//function for counting number of edges
 		inline void getedges()
 		{
 			int counter =0;
-			for(int i=0;i<50;i++)
+			for(int i=0;i<vertices;i++)
 			{
-				for(int j=0;j<50;j++)
+				for(int j=0;j<vertices;j++)
 				{
 					if(graph[i][j].first == true)
 						counter++;
@@ -126,7 +104,7 @@ class Graph
 		inline void neighbors(int x)
 		{
 			cout << "Neighbors are: ";
-			for(int i=0;i<50;i++)
+			for(int i=0;i<vertices;i++)
 			{
 				if(i==(x-1))
 					continue;
@@ -170,7 +148,7 @@ class Graph
 class ShortestPath:public Graph
 {
 	public:
-		ShortestPath(int edge_density, int min_dist, int max_dist): Graph(edge_density, min_dist, max_dist){}
+		ShortestPath(int edge_density, int min_dist, int max_dist, int vertices): Graph(edge_density, min_dist, max_dist, vertices){}
 		
 		//function for finding the min value in the open set according to the algorithm
 		inline pair <int,int> find_min(vector <pair <int, int> > &open_set)
@@ -212,7 +190,7 @@ class ShortestPath:public Graph
 			
 			closed_set.push_back(make_pair(source-1,0)); //place the source in closed set
 			//place all the edges of source in the open set
-			for(int i=0; i<50; i++)
+			for(int i=0; i<vertices; i++)
 			{
 				if(i==source-1)
 					continue;
@@ -236,7 +214,7 @@ class ShortestPath:public Graph
 				closed_set.push_back(make_pair(node_to_move, min.second));
 				
 				//find all the edges of the node just placed in the closed set and place it in the open set				
-				for(int i=0;i<50;i++)
+				for(int i=0;i<vertices;i++)
 				{
 					not_in_closed_set = true;
 					not_in_open_set = true;
@@ -278,7 +256,7 @@ class ShortestPath:public Graph
 				cout << "No path exists" << endl;
 			else
 			{
-				cout << "Path distance: " << closed_set[closed_set.size() -1].second << endl;
+				cout << "Path distance: " << closed_set[closed_set.size() -1].second << " ";
 				//backtrack all the nodes to find the path
 				vector <int> result;
 				vector <int> temp_index;
@@ -289,7 +267,7 @@ class ShortestPath:public Graph
 				while(result[result.size()-1]!=(source-1))
 				{
 					//puts all the indexes of the nodes leading to 'the most recently placed node in result vector' in temp_index vector
-					for(int i=0;i<50;i++)
+					for(int i=0;i<vertices;i++)
 					{
 						if(graph[i][result[result.size()-1]].first == true)
 							temp_index.push_back(i);
@@ -322,8 +300,9 @@ class ShortestPath:public Graph
 					temp_weight.clear();
 				}
 				//print it back to front
+				cout << ":Path: ";
 				for(int i=((int)result.size() -1); i>=0; i--)
-					cout << "Node " << result[i]+1 << "-";
+					cout << "Node " << result[i]+1 << "- ";
 				
 				cout << "\n";
 			}
@@ -332,15 +311,149 @@ class ShortestPath:public Graph
 
 int main()
 {	
-	int edge_density,min_dist = 1,max_dist = 10;
+	int edge_density,min_dist,max_dist,source,vertices;
+	cout << "Enter the number of vertices: " << endl;
+	cin >> vertices;
+	cout << "Enter edge density in %: " << endl;
+	cin >> edge_density;
+	cout << "Enter min and max distance range separated by space: " << endl;
+	cin >> min_dist >> max_dist;
+	cout << "Enter the source node (from node 1 to node " << vertices << "): " <<endl;
+	cin >> source;
 	
-	edge_density = 20;
-	ShortestPath mygraph(edge_density,min_dist,max_dist);
-	mygraph.avgpathlength();
+	ShortestPath mygraph(edge_density,min_dist,max_dist,vertices); //initializing graph
+	cout << "Shortest dist from node " << source << ": " <<endl;
 	
-	edge_density = 40;
-	ShortestPath mygraph1(edge_density,min_dist,max_dist);
-	mygraph1.avgpathlength();
+	for(int i=0;i<vertices;i++)
+	{
+		cout << "Node " << source << " to " << (i+1) << " is: ";
+		mygraph.path(source,i);
+	}
 	
 	return 0;
 }
+
+/*
+****************Output 1**********************:
+Enter the number of vertices:
+50
+Enter edge density in %:
+20
+Enter min and max distance range separated by space:
+1 10
+Enter the source node (from node 1 to node 50):
+1
+Shortest dist from node 1:
+Node 1 to 1 is: No path exists
+Node 1 to 2 is: Path distance: 0 :Path: Node 1-
+Node 1 to 3 is: Path distance: 6 :Path: Node 1- Node 6- Node 2-
+Node 1 to 4 is: Path distance: 5 :Path: Node 1- Node 10- Node 3-
+Node 1 to 5 is: Path distance: 5 :Path: Node 1- Node 35- Node 4-
+Node 1 to 6 is: Path distance: 6 :Path: Node 1- Node 10- Node 5-
+Node 1 to 7 is: Path distance: 4 :Path: Node 1- Node 6-
+Node 1 to 8 is: Path distance: 4 :Path: Node 1- Node 10- Node 7-
+Node 1 to 9 is: Path distance: 6 :Path: Node 1- Node 6- Node 8-
+Node 1 to 10 is: Path distance: 4 :Path: Node 1- Node 10- Node 9-
+Node 1 to 11 is: Path distance: 1 :Path: Node 1- Node 10-
+Node 1 to 12 is: Path distance: 9 :Path: Node 1- Node 6- Node 11-
+Node 1 to 13 is: Path distance: 6 :Path: Node 1- Node 6- Node 12-
+Node 1 to 14 is: Path distance: 5 :Path: Node 1- Node 13-
+Node 1 to 15 is: Path distance: 7 :Path: Node 1- Node 35- Node 14-
+Node 1 to 16 is: Path distance: 4 :Path: Node 1- Node 35- Node 15-
+Node 1 to 17 is: Path distance: 6 :Path: Node 1- Node 10- Node 16-
+Node 1 to 18 is: Path distance: 7 :Path: Node 1- Node 10- Node 17-
+Node 1 to 19 is: Path distance: 2 :Path: Node 1- Node 10- Node 18-
+Node 1 to 20 is: Path distance: 7 :Path: Node 1- Node 19-
+Node 1 to 21 is: Path distance: 10 :Path: Node 1- Node 6- Node 20-
+Node 1 to 22 is: Path distance: 4 :Path: Node 1- Node 35- Node 21-
+Node 1 to 23 is: Path distance: 3 :Path: Node 1- Node 10- Node 22-
+Node 1 to 24 is: Path distance: 3 :Path: Node 1- Node 35- Node 23-
+Node 1 to 25 is: Path distance: 5 :Path: Node 1- Node 10- Node 24-
+Node 1 to 26 is: Path distance: 7 :Path: Node 1- Node 35- Node 25-
+Node 1 to 27 is: Path distance: 6 :Path: Node 1- Node 35- Node 26-
+Node 1 to 28 is: Path distance: 7 :Path: Node 1- Node 6- Node 27-
+Node 1 to 29 is: Path distance: 7 :Path: Node 1- Node 10- Node 28-
+Node 1 to 30 is: Path distance: 7 :Path: Node 1- Node 35- Node 29-
+Node 1 to 31 is: Path distance: 7 :Path: Node 1- Node 10- Node 22- Node 30-
+Node 1 to 32 is: Path distance: 5 :Path: Node 1- Node 6- Node 31-
+Node 1 to 33 is: Path distance: 4 :Path: Node 1- Node 10- Node 32-
+Node 1 to 34 is: Path distance: 4 :Path: Node 1- Node 10- Node 33-
+Node 1 to 35 is: Path distance: 4 :Path: Node 1- Node 10- Node 34-
+Node 1 to 36 is: Path distance: 2 :Path: Node 1- Node 35-
+Node 1 to 37 is: Path distance: 6 :Path: Node 1- Node 35- Node 36-
+Node 1 to 38 is: Path distance: 8 :Path: Node 1- Node 10- Node 22- Node 37-
+Node 1 to 39 is: Path distance: 1 :Path: Node 1- Node 38-
+Node 1 to 40 is: Path distance: 7 :Path: Node 1- Node 6- Node 39-
+Node 1 to 41 is: Path distance: 7 :Path: Node 1- Node 35- Node 40-
+Node 1 to 42 is: Path distance: 5 :Path: Node 1- Node 10- Node 41-
+Node 1 to 43 is: Path distance: 6 :Path: Node 1- Node 35- Node 42-
+Node 1 to 44 is: Path distance: 5 :Path: Node 1- Node 10- Node 43-
+Node 1 to 45 is: Path distance: 2 :Path: Node 1- Node 10- Node 44-
+Node 1 to 46 is: Path distance: 9 :Path: Node 1- Node 10- Node 22- Node 45-
+Node 1 to 47 is: Path distance: 7 :Path: Node 1- Node 10- Node 46-
+Node 1 to 48 is: Path distance: 4 :Path: Node 1- Node 35- Node 47-
+Node 1 to 49 is: Path distance: 5 :Path: Node 1- Node 35- Node 48-
+Node 1 to 50 is: Path distance: 5 :Path: Node 1- Node 35- Node 49-
+
+
+****************Output 2**********************
+Enter the number of vertices:
+50
+Enter edge density in %:
+40
+Enter min and max distance range separated by space:
+1 10
+Enter the source node (from node 1 to node 50):
+1
+Shortest dist from node 1:
+Node 1 to 1 is: No path exists
+Node 1 to 2 is: Path distance: 0 :Path: Node 1-
+Node 1 to 3 is: Path distance: 1 :Path: Node 1- Node 2-
+Node 1 to 4 is: Path distance: 4 :Path: Node 1- Node 2- Node 3-
+Node 1 to 5 is: Path distance: 2 :Path: Node 1- Node 4-
+Node 1 to 6 is: Path distance: 3 :Path: Node 1- Node 5-
+Node 1 to 7 is: Path distance: 3 :Path: Node 1- Node 2- Node 6-
+Node 1 to 8 is: Path distance: 3 :Path: Node 1- Node 2- Node 7-
+Node 1 to 9 is: Path distance: 1 :Path: Node 1- Node 8-
+Node 1 to 10 is: Path distance: 5 :Path: Node 1- Node 2- Node 9-
+Node 1 to 11 is: Path distance: 4 :Path: Node 1- Node 2- Node 10-
+Node 1 to 12 is: Path distance: 4 :Path: Node 1- Node 11-
+Node 1 to 13 is: Path distance: 4 :Path: Node 1- Node 2- Node 12-
+Node 1 to 14 is: Path distance: 3 :Path: Node 1- Node 13-
+Node 1 to 15 is: Path distance: 3 :Path: Node 1- Node 2- Node 14-
+Node 1 to 16 is: Path distance: 2 :Path: Node 1- Node 15-
+Node 1 to 17 is: Path distance: 3 :Path: Node 1- Node 2- Node 16-
+Node 1 to 18 is: Path distance: 3 :Path: Node 1- Node 2- Node 17-
+Node 1 to 19 is: Path distance: 3 :Path: Node 1- Node 2- Node 18-
+Node 1 to 20 is: Path distance: 2 :Path: Node 1- Node 2- Node 19-
+Node 1 to 21 is: Path distance: 3 :Path: Node 1- Node 20-
+Node 1 to 22 is: Path distance: 2 :Path: Node 1- Node 2- Node 21-
+Node 1 to 23 is: Path distance: 2 :Path: Node 1- Node 2- Node 22-
+Node 1 to 24 is: Path distance: 4 :Path: Node 1- Node 2- Node 23-
+Node 1 to 25 is: Path distance: 3 :Path: Node 1- Node 2- Node 24-
+Node 1 to 26 is: Path distance: 4 :Path: Node 1- Node 25-
+Node 1 to 27 is: Path distance: 2 :Path: Node 1- Node 26-
+Node 1 to 28 is: Path distance: 2 :Path: Node 1- Node 27-
+Node 1 to 29 is: Path distance: 2 :Path: Node 1- Node 28-
+Node 1 to 30 is: Path distance: 3 :Path: Node 1- Node 4- Node 29-
+Node 1 to 31 is: Path distance: 4 :Path: Node 1- Node 2- Node 30-
+Node 1 to 32 is: Path distance: 1 :Path: Node 1- Node 31-
+Node 1 to 33 is: Path distance: 2 :Path: Node 1- Node 32-
+Node 1 to 34 is: Path distance: 1 :Path: Node 1- Node 33-
+Node 1 to 35 is: Path distance: 3 :Path: Node 1- Node 2- Node 34-
+Node 1 to 36 is: Path distance: 2 :Path: Node 1- Node 2- Node 35-
+Node 1 to 37 is: Path distance: 2 :Path: Node 1- Node 2- Node 36-
+Node 1 to 38 is: Path distance: 2 :Path: Node 1- Node 2- Node 37-
+Node 1 to 39 is: Path distance: 5 :Path: Node 1- Node 2- Node 38-
+Node 1 to 40 is: Path distance: 2 :Path: Node 1- Node 39-
+Node 1 to 41 is: Path distance: 3 :Path: Node 1- Node 40-
+Node 1 to 42 is: Path distance: 5 :Path: Node 1- Node 41-
+Node 1 to 43 is: Path distance: 3 :Path: Node 1- Node 2- Node 42-
+Node 1 to 44 is: Path distance: 1 :Path: Node 1- Node 43-
+Node 1 to 45 is: Path distance: 2 :Path: Node 1- Node 2- Node 44-
+Node 1 to 46 is: Path distance: 4 :Path: Node 1- Node 2- Node 45-
+Node 1 to 47 is: Path distance: 2 :Path: Node 1- Node 46-
+Node 1 to 48 is: Path distance: 3 :Path: Node 1- Node 47-
+Node 1 to 49 is: Path distance: 4 :Path: Node 1- Node 48-
+Node 1 to 50 is: Path distance: 3 :Path: Node 1- Node 49-
+*/
