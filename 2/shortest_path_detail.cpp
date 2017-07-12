@@ -85,7 +85,7 @@ class Graph
 		virtual void path(int source, int destination) = 0; //pure virtual function for calculating shortest path 
 		
 		//function for calculating avg path length
-		void avgpathlength()
+		inline void avgpathlength()
 		{
 			float counter = 0;
 			float sum = 0;
@@ -101,7 +101,7 @@ class Graph
 			cout << "Avg path length with edge density " << edge_density << "% is: " << (sum / counter) << endl;
 		}
 		//function for counting number of edges
-		void getedges()
+		inline void getedges()
 		{
 			int counter =0;
 			for(int i=0;i<50;i++)
@@ -115,7 +115,7 @@ class Graph
 			cout << "Number of edges: " << (counter/2) << endl;
 		}
 		//function for checking whether a edge exists or not between x and y
-		void adjacent(int x, int y)
+		inline void adjacent(int x, int y)
 		{
 			if(graph[x-1][y-1].first == true)
 				cout << "Edge exists" << endl;
@@ -123,7 +123,7 @@ class Graph
 				cout << "Edge does not exist" << endl;
 		}
 		//function for finding all the neighbors of node x
-		void neighbors(int x)
+		inline void neighbors(int x)
 		{
 			cout << "Neighbors are: ";
 			for(int i=0;i<50;i++)
@@ -136,7 +136,7 @@ class Graph
 			cout << "\n";
 		}
 		//function for adding a edge between node x and node y
-		void add(int x, int y)
+		inline void add(int x, int y)
 		{
 			if(graph[x-1][y-1].first == false)
 			{
@@ -145,7 +145,7 @@ class Graph
 			}
 		}
 		//function for deleting a edge between node x and y if the edge exists
-		void delete_edge(int x, int y)
+		inline void delete_edge(int x, int y)
 		{
 			if(graph[x-1][y-1].first == true)
 			{
@@ -154,13 +154,13 @@ class Graph
 			}
 		}
 		//function returns weight of the edge between node x and node y
-		void get_edge_value(int x, int y)
+		inline void get_edge_value(int x, int y)
 		{
 			if(graph[x-1][y-1].first == true)
 				cout << "Edge value: " << graph[x-1][y-1].second << endl;
 		}
 		//function sets the weight of the edge between node x and node y if the edge exists
-		void set_edge_value(int x, int y, int value)
+		inline void set_edge_value(int x, int y, int value)
 		{
 			if(graph[x-1][y-1].first == true)
 				graph[x-1][y-1].second = value;
@@ -173,7 +173,7 @@ class ShortestPath:public Graph
 		ShortestPath(int edge_density, int min_dist, int max_dist): Graph(edge_density, min_dist, max_dist){}
 		
 		//function for finding the min value in the open set according to the algorithm
-		pair <int,int> find_min(vector <pair <int, int> > &open_set)
+		inline pair <int,int> find_min(vector <pair <int, int> > &open_set)
 		{
 			int index = 0;
 			int small = open_set[0].second;
@@ -188,7 +188,7 @@ class ShortestPath:public Graph
 			return (make_pair(index, small));
 		}
 		//finding min value in a vector
-		int findmin(vector <int> &temp_weight)
+		inline int findmin(vector <int> &temp_weight)
 		{
 			int small = temp_weight[0];
 			for(int i=1;i<(int)temp_weight.size();i++)
